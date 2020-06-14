@@ -18,7 +18,7 @@ namespace FindTrip_Web.Models
         [MaxLength(50)]
         public string Product { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+  
         public DateTime? CreateOn { get; set; }
     }
 }

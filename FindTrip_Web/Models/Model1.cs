@@ -34,7 +34,9 @@
 
         public virtual DbSet<PointsHistory> PointsHistories { get; set; }
 
+        public virtual DbSet<Message> Messages { get; set; }
 
+        public virtual DbSet<MessageReply> MessageReplies { get; set; }
     }
 
     //public class MyEntity

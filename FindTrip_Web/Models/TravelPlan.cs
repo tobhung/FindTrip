@@ -55,12 +55,14 @@ namespace FindTrip_Web.Models
 
         public bool Religion { get; set; }
 
+        public int points { get; set;  }
         public int TPPrice { get; set; }
         [MaxLength(200)]
         public string TPExperience { get; set; }
 
-        [DatabaseGenerated(databaseGeneratedOption: DatabaseGeneratedOption.Computed)]
+        //[DatabaseGenerated(databaseGeneratedOption: DatabaseGeneratedOption.Computed)]
         public DateTime? CreateOn { get; set; }
+
 
         //public virtual ICollection<Order> Orders { get; set; }
 

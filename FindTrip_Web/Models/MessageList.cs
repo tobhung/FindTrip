@@ -10,14 +10,10 @@ namespace FindTrip_Web.Models
     public class MessageList
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
 
         public int MemberId { get; set; }
-
-        public virtual Member MyMember { get; set; }
-
-        [MaxLength(200)]
+        //public virtual Member MyMember { get; set; }
 
         public string MessageContent { get; set;  }
 

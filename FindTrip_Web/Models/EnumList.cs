@@ -19,9 +19,9 @@ namespace FindTrip_Web.Models
 
         public enum OrderStatus
         {
-            TobeConfirmed = 1,
-            OrderConfirmed = 2,
-            Completed = 3
+            未確認 = 1,
+            委任中 = 2,
+            已完成 = 3
         }
 
         public enum TravelType

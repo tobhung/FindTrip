@@ -5,6 +5,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using FindTrip_Web.common;
 
 namespace FindTrip_Web
 {
@@ -28,7 +29,10 @@ namespace FindTrip_Web
                 defaults: new { id = RouteParameter.Optional }
             );
 
-
+            config.ParameterBindingRules.Insert(0, descriptor =>
+                typeof(IPatchState).IsAssignableFrom(descriptor.ParameterType)
+                    ? new PatchBinding(descriptor)
+                    : null);
         }
     }
 }

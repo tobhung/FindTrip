@@ -20,7 +20,7 @@ namespace FindTrip_Web.Security
             Dictionary<string, Object> payload = new Dictionary<string, Object>();//payload 需透過token傳遞的資料
             payload.Add("id", id);
             payload.Add("Email", Email);
-            payload.Add("Exp", DateTime.Now.AddSeconds(Convert.ToInt32("10000")).ToString());//Token 時效設定100秒
+            payload.Add("Exp", DateTime.Now.AddSeconds(Convert.ToInt32("100000000")).ToString());//Token 時效設定100秒
             var token = Jose.JWT.Encode(payload, Encoding.UTF8.GetBytes(secret), JwsAlgorithm.HS256);//產生token
             return token;
         }

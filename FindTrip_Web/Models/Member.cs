@@ -27,7 +27,6 @@ namespace FindTrip_Web.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        
         public string PasswordSalt { get; set; }
 
 
@@ -55,7 +54,7 @@ namespace FindTrip_Web.Models
         public int RatingSum { get; set; }
         public int RatingAvg { get; set; }
         
-        [DatabaseGenerated(databaseGeneratedOption:DatabaseGeneratedOption.Computed)]
+       
         public DateTime? CreateOn { get; set; }
 
         [MaxLength(50)]
@@ -79,6 +78,8 @@ namespace FindTrip_Web.Models
         public string PlannerSocial4 { get; set; }
         
         public string PlannerTel { get; set; }
+
+        public string PlannerIntro { get; set;  }
 
 
         public virtual ICollection<TravelPlan> TravelPlans { get; set; }

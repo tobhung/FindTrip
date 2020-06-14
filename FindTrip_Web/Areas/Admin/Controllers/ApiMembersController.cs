@@ -65,25 +65,22 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             string token = Request.Headers.Authorization.Parameter;
             JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
             int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
-            //if (Mid != member.id)
-            //{
-            //    return NotFound();
-            //} // THIS IS TOO STUPID, DO NOT OPEN THIS AGAIN
-          
-                var result = db.Members.Where(x => x.id == Mid).Select(x => new
-                {
-                    x.id,
-                    x.name,
-                    x.points,
-                    x.manpic,
-                    x.MemberIntro,
-                    x.Tel,
-                    x.PlannerSocial1,
-                    x.PlannerSocial2
-                });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { success= true, result});
-            
+            var result = db.Members.Where(x => x.id == Mid).Select(x => new
+            {
+                x.id,
+                x.name,
+                x.points,
+                x.manpic,
+                x.MemberIntro,
+                x.Tel,
+                x.PlannerSocial1,
+                x.PlannerSocial2,
+                x.Email
+            });
+
+            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, result });
+
 
             //if (member.Permission == "02")
             //{
@@ -100,11 +97,11 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             //    });
 
             //    return Request.CreateResponse(HttpStatusCode.OK, new {success = true, result2});
-            }
+        }
 
-            //string newResult = JsonConvert.SerializeObject(result);
-            // HttpContext.Current.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-            //return Request.CreateResponse(HttpStatusCode.NoContent);
+        //string newResult = JsonConvert.SerializeObject(result);
+        // HttpContext.Current.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+        //return Request.CreateResponse(HttpStatusCode.NoContent);
 
 
         // GET: api/ApiMembers/5
@@ -114,12 +111,78 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             return Ok();
         }
 
+        //[Route("account")]
+        public HttpResponseMessage PatchMember(PatchMember patchMember)
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+
+
+            Member member = db.Members.Find(Mid);
+
+
+            if (member.Permission == "01")
+            {
+
+            patchMember.Password = Utility.GenerateHashWithSalt(patchMember.Password, member.PasswordSalt);
+            patchMember.Patch(member);
+
+            db.SaveChanges();
+
+            var result1 = db.Members.Where(x => x.id == Mid).Select(x => new
+            {
+                x.id,
+                x.name,
+                x.Tel,
+                x.MemberIntro,
+                x.PlannerSocial1,
+                x.PlannerSocial2,
+
+            });
+
+            //string result = JsonConvert.DeserializeObject<PatchMember>(result1).ToString();
+
+            return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "成功修改", result1});
+
+            }
+
+            if(member.Permission == "02")
+            {
+                patchMember.Password = Utility.GenerateHashWithSalt(patchMember.Password, member.PasswordSalt);
+                patchMember.Patch(member);
+
+                db.SaveChanges();
+
+                var result2 = db.Members.Where(x => x.id == Mid).Select(x => new
+                {
+                    x.id,
+                    x.name,
+                    x.Tel,
+                    x.MemberIntro,
+                    x.PlannerSocial1,
+                    x.PlannerSocial2,
+                    x.PlannerName,
+                    x.PlannerIntro,
+                    x.PlannerSocial3,
+                    x.PlannerSocial4,
+
+                });
+
+                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "規劃師成功修改", result2});
+
+            }
+
+            return Request.CreateResponse(HttpStatusCode.NoContent, new {message = "沒東西R"});
+
+        }
+
 
         // PUT: api/ApiMembers/5
         [JwtAuthFilter]
-        [Route("account")]
+        
         //[ResponseType(typeof(void))]
-        public HttpResponseMessage PatchMembeResult(Member member)
+        public HttpResponseMessage PatchMemberTest(Member member)
         {
             string token = Request.Headers.Authorization.Parameter;
             JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
@@ -127,51 +190,215 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
+            
 
-            if (member.id != Mid )
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            var memberDetail = db.Members.Find(Mid);
-            memberDetail.id = Mid;
-            memberDetail.name = member.name;
-            memberDetail.MemberIntro = member.MemberIntro;
-            memberDetail.Tel = member.Tel;
-            memberDetail.PlannerSocial1 = member.PlannerSocial1;
-            memberDetail.PlannerSocial2 = member.PlannerSocial2;
-            memberDetail.PasswordSalt = Utility.CreateSalt();
-            memberDetail.Password = Utility.GenerateHashWithSalt(member.Password, memberDetail.PasswordSalt);
-            //member.password here is the new password
-
+            //member.id = Mid;
             //member.PasswordSalt = Utility.CreateSalt();
             //member.Password = Utility.GenerateHashWithSalt(member.Password, member.PasswordSalt);
-            db.SaveChanges();
+            //member.MemberIntro = member.MemberIntro;
 
-            var result = db.Members.Where(x => x.id == Mid).Select(x => new
+            var change = db.Members.Find(Mid);
+
+            if (change.Permission == "01")
             {
-                member.id,
-                member.name,
-                member.Tel,
-                member.MemberIntro,
-                member.PlannerSocial1,
-                member.PlannerSocial2,
-                member.Password
-            });
 
-           
-            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "成功修改", result});
-               
 
-            //if (member.Permission == "02")
-            //{
-            //    memberDetail.id = Mid;
-            //}
 
-            //return Ok();
+                change.PasswordSalt = Utility.CreateSalt();
+                change.Password = Utility.GenerateHashWithSalt(member.Password, change.PasswordSalt);
+                change.Tel = member.Tel;
+                change.PlannerSocial1 = member.PlannerSocial1;
+                change.PlannerSocial2 = member.PlannerSocial2;
+
+            }
+            else if (change.Permission == "02")
+            {
+                change.PasswordSalt = Utility.CreateSalt();
+                change.Password = Utility.GenerateHashWithSalt(member.Password, change.PasswordSalt);
+                change.Tel = member.Tel;
+                change.PlannerSocial1 = member.PlannerSocial1;
+                change.PlannerSocial2 = member.PlannerSocial2;
+                change.PlannerName = member.PlannerName;
+                change.PlannerIntro = member.PlannerIntro;
+
+            }
+
+            //db.Entry(member).State = EntityState.Modified;
+
+            try
+            {
+                db.SaveChanges();
+
+                var result = db.Members.Where(x => x.id == Mid).Select(x => new
+                {
+                    x.id,
+                    x.name,
+                    x.Tel,
+                    x.MemberIntro,
+                    x.PlannerSocial1,
+                    x.PlannerSocial2,
+                    x.Password
+
+                });
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "成功修改", result });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MemberExists(Mid))
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Request.CreateResponse(HttpStatusCode.NoContent);
         }
+
+
+        [JwtAuthFilter]
+        //[Route("account")]
+
+        public HttpResponseMessage PatchMember(Member member)
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            var change = db.Members.Find(Mid);
+
+            change.name = member.name;
+            change.PasswordSalt = Utility.CreateSalt();
+            change.Password = Utility.GenerateHashWithSalt(member.Password, change.PasswordSalt);
+            change.Tel = member.Tel;
+            change.PlannerSocial1 = member.PlannerSocial1;
+            change.PlannerSocial2 = member.PlannerSocial2;
+
+            //db.Entry(member).State = EntityState.Modified;
+
+            try
+            {
+                db.SaveChanges();
+
+                var result = db.Members.Where(x => x.id == Mid).Select(x => new
+                {
+                    x.id,
+                    x.Email,
+                    x.name,
+                    x.Tel,
+                    x.MemberIntro,
+                    x.PlannerSocial1,
+                    x.PlannerSocial2,
+
+                });
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "成功修改", result });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MemberExists(Mid))
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Request.CreateResponse(HttpStatusCode.NoContent);
+        }
+
+        [JwtAuthFilter]
+        [Route("account")]
+        public HttpResponseMessage PutMember(Member member)
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+
+            var change = db.Members.Find(Mid);
+
+            if (change.Permission == "01")
+            {
+                change.name = member.name;
+                //change.PasswordSalt = Utility.CreateSalt();
+                //change.Password = Utility.GenerateHashWithSalt(member.Password, change.PasswordSalt);
+                change.Tel = member.Tel;
+                change.PlannerSocial1 = member.PlannerSocial1;
+                change.PlannerSocial2 = member.PlannerSocial2;
+                change.MemberIntro = member.MemberIntro;
+                change.manpic = member.manpic;
+                db.SaveChanges();
+
+                var result = db.Members.Where(x => x.id == Mid).Select(x => new
+                {
+                    x.id,
+                    x.Email,
+                    x.name,
+                    x.Tel,
+                    x.MemberIntro,
+                    x.PlannerSocial1,
+                    x.PlannerSocial2,
+                    x.manpic
+
+                });
+
+                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "旅行家修改成功", result});
+            }
+
+            if (change.Permission == "02")
+            {
+                change.name = member.name;
+                //change.PasswordSalt = Utility.CreateSalt();
+                //change.Password = Utility.GenerateHashWithSalt(member.Password, change.PasswordSalt);
+                change.Tel = member.Tel;
+                change.PlannerIntro = member.PlannerIntro;
+                change.PlannerName = member.PlannerName;
+                change.PlannerTel = member.PlannerTel;
+                change.PlannerSocial1 = member.PlannerSocial1;
+                change.PlannerSocial2 = member.PlannerSocial2;
+                change.PlannerSocial3 = member.PlannerSocial3;
+                change.PlannerSocial4 = member.PlannerSocial4;
+                change.MemberIntro = member.MemberIntro;
+                change.manpic = member.manpic; 
+                db.SaveChanges();
+
+                var result2 = db.Members.Where(x => x.id == Mid).Select(x => new
+                {
+                    x.id,
+                    x.Email,
+                    x.name,
+                    x.Tel,
+                    x.MemberIntro,
+                    x.PlannerSocial1,
+                    x.PlannerSocial2,
+                    x.PlannerIntro,
+                    x.PlannerName,
+                    x.PlannerTel,
+                    x.PlannerSocial3,
+                    x.PlannerSocial4,
+                    x.manpic
+                });
+
+                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = " 規劃師修改成功", result2});
+
+            }
+
+            return Request.CreateResponse(HttpStatusCode.NoContent);
+
+        }
+
 
 
         // POST: api/ApiMembers
@@ -194,7 +421,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 if (postedFile != null && postedFile.ContentLength > 0)
                 {
                     //string extension = postedFile.FileName.Split('.')[postedFile.FileName.Split('.').Length - 1];
-                    int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
+                    //int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
                     string fileName = Utility.SaveUpImage(postedFile);
                     //IList<string> AllowedFileExtensions = new List<string> {".jpg", ".png", ".svg"};
 
@@ -260,7 +487,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 if (postedFile != null && postedFile.ContentLength > 0)
                 {
                     //string extension = postedFile.FileName.Split('.')[postedFile.FileName.Split('.').Length - 1];
-                    int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
+                    //int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
                     string fileName = Utility.UploadImage(postedFile);
                     //IList<string> AllowedFileExtensions = new List<string> {".jpg", ".png", ".svg"};
 
@@ -319,8 +546,10 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             {
                 JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
                 string jwtToken = jwtAuthUtil.GenerateToken(member.id, member.Email);
+
+              
                 return Request.CreateResponse(HttpStatusCode.OK,
-                    new { success = true, message = "登入成功", token = jwtToken, member.points, member.Permission, member.id });
+                    new { success = true, message = "登入成功", token = jwtToken, member.points, member.Permission, member.id, member.Email });
                 //return Request.CreateResponse(HttpStatusCode.OK,
                 //    new { success = true, message = "登入成功" });
             }
@@ -329,6 +558,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             {
                 success = false,
                 message = "登入失敗"
+
             });
         }
 
@@ -375,6 +605,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             string remind2 = "輸入您的推特帳號";
             member.PlannerSocial2 = pathSocial2 + remind2;
             member.Permission = "01";
+            member.CreateOn = DateTime.Now;
 
             db.Members.Add(member);
             //SendAuthCodeToMember(member);
@@ -395,7 +626,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         [Route("topup")]
         public HttpResponseMessage RechargePoints(PointsHistory pointsHistory)
         {
-            
+
             string token = Request.Headers.Authorization.Parameter;
             JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
             int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
@@ -404,14 +635,17 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             if (pointsHistory.Product != null)
             {
                 pointsHistory.MemberId = Mid;
-                int leftover = member.points + Convert.ToInt32(pointsHistory.Product);
-                member.points = leftover;
+                var total = member.points + Convert.ToInt32(pointsHistory.Product);
+                member.points = total;
+                pointsHistory.CreateOn = DateTime.Now;
 
+
+                db.Entry(member).State = EntityState.Modified;
+                db.PointsHistories.Add(pointsHistory);
                 db.SaveChanges();
                 return Request.CreateResponse(HttpStatusCode.OK,
                     new { success = true, member.points, message = "儲值成功", pointsHistory.Product });
             }
-
 
             return Request.CreateResponse(HttpStatusCode.BadRequest, new { success = false, message = "儲值失敗" });
         }

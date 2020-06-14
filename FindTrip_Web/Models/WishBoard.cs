@@ -25,7 +25,7 @@ namespace FindTrip_Web.Models
 
         public int LikeTotal { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+   
         public DateTime? CreateOn { get; set; }
 
         public int MemberId { get; set; }
