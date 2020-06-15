@@ -37,13 +37,11 @@ namespace FindTrip_Web.Areas.Admin.Controllers
     public class ApiTravelPlansController : ApiController
     {
         private Model1 db = new Model1();
-        TravelPlan travlPlan = new TravelPlan();
-
 
         // GET: api/ApiTravelPlans
 
             
-        //search web api
+        //search function for index page
         [Route("search")]
         public HttpResponseMessage GetSearchPlans( string search)
         {
@@ -95,6 +93,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             return Ok(travelPlan);
         }
 
+        //首頁所有旅行計畫  不帶token
         [Route("index")]
         public HttpResponseMessage GetMemberPlans(TravelPlan travelPlan)
         {
@@ -107,7 +106,8 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 city = c.Districts.Where(d => d.Cid == c.id).Select(d => d.city)
             });
 
-            var allPlans = db.TravelPlans.Select(x => new
+            var allPlans = db.TravelPlans.OrderByDescending(x=>x.CreateOn).
+                Select(x => new
             {
                 x.id,
                 x.MemberId,
@@ -133,60 +133,9 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null? 0: 1,
                
 
-            });
+            }).Take(20);
 
             return Request.CreateResponse(HttpStatusCode.OK, new { success = true, allPlans, countries });
-
-        }
-
-        [Route("index/test")]
-        public HttpResponseMessage GetMemberPlansTest(TravelPlan travelPlan)
-        {
-            Countries country = new Countries();
-
-            var countries = db.Countries.Select(c => new
-            {
-                c.id,
-                c.country,
-                city = c.Districts.Where(d => d.Cid == c.id).Select(d => d.city)
-            });
-
-            var allPlans = db.TravelPlans.Select(x => new
-            {
-                x.id,
-                x.MemberId,
-                x.points,
-                Cpicture = x.Cpicture,
-                x.MyMember.manpic,
-                x.MyMember.name,
-                x.country,
-                x.city,
-                x.CreateOn,
-
-                tags = new
-                {
-                    x.Act,
-                    x.Culture,
-                    x.Food,
-                    x.Secret,
-                    x.Shopping,
-                    x.Religion
-                },
-
-                rating = db.Ratings.Count(y => y.TravelId == x.id),
-                star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average()
-                //rating = db.Ratings.Where(y => y.TravelId == x.id).Select(y => new
-                //{
-                //    y.rating,
-                //    y.star
-
-                //})
-
-            }).ToList();
-
-  
-
-            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, allPlans, countries});
 
         }
 
@@ -204,7 +153,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             var countries = db.Countries.Select(c => new
             {
                 c.id,
-                country = c.country,
+                c.country,
                 city = c.Districts.Where(d => d.Cid == c.id).Select(d => d.city)
             });
 
@@ -331,22 +280,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, new {success = true, result});
             }
 
-        //string ConvertStringArrayToString(string[] DepartureTime1)
-        //{
-        //    //
-        //    // Concatenate all the elements into a StringBuilder.
-        //    //
-        //    StringBuilder sb = new StringBuilder();
-        //    foreach (string value in DepartureTime1)
-        //    {
-        //        sb.Append(value);
-        //        sb.Append(' ');
-        //    }
-        //    return sb.ToString();
-        //}
 
-        //// PUT: api/ApiTravelPlans/5
-        ////[ResponseType(typeof(void))]
         [JwtAuthFilter]
         [Route("update/{id}")]
         public HttpResponseMessage PatchTravelPlan(int id, TravelPlan travelPlan)
@@ -356,18 +290,11 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
 
             var planChanges = db.TravelPlans.Find(id);
-            //TravelPlan travelPlan = db.TravelPlans.Find(id);
+     
             if (!ModelState.IsValid)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
-
-            //if (id != travelPlan.id)
-            //{
-            //    return Request.CreateResponse(HttpStatusCode.NotFound);
-            //}
-
-            //travelPlan.MemberId = Mid;
 
 
             planChanges.TravelPlanIntro = travelPlan.TravelPlanIntro;
@@ -403,17 +330,69 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 x.Shopping,
                 x.Religion
 
-                //tags = db.TravelPlans.Where(z => z.id == travelPlan.id).Select(z => new
-                //{
-                //    z.Act,
-                //    z.Secret,
-                //    z.Culture,
-                //    z.Food,
-                //    z.Shopping,
-                //    z.Religion
-                //})
             });
 
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "旅行計畫修改成功" });
+        }
+
+        [JwtAuthFilter]
+        [Route("update/test/{id}")]
+        public HttpResponseMessage PatchTravelPlans(int id, TravelPlan travelPlan)
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+
+            var planChanges = db.TravelPlans.Find(id);
+
+            if (!ModelState.IsValid)
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+
+            if (planChanges.MemberId != Mid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    new { success = false, message = "THE PLAN DOESNT BELONG TO PLANNER LA" });
+            }
+
+            planChanges.TravelPlanIntro = travelPlan.TravelPlanIntro;
+            planChanges.TPExperience = travelPlan.TPExperience;
+            planChanges.points = travelPlan.points;
+            planChanges.Act = travelPlan.Act;
+            planChanges.Culture = travelPlan.Culture;
+            planChanges.Food = travelPlan.Food;
+            planChanges.Secret = travelPlan.Secret;
+            planChanges.Shopping = travelPlan.Shopping;
+            planChanges.country = travelPlan.country;
+            planChanges.city = travelPlan.city;
+
+
+
+            //db.TravelPlans.Attach(travelPlan);
+            //db.Entry(travelPlan).State = EntityState.Modified;
+            db.SaveChanges();
+
+            var result = db.TravelPlans.Where(x => x.id == id).Select(x => new
+            {
+                x.id,
+                x.MemberId,
+                x.points,
+                x.MyMember.name,
+                x.TravelPlanIntro,
+                x.TPExperience,
+                x.country,
+                x.city,
+                x.Act,
+                x.Culture,
+                x.Food,
+                x.Secret,
+                x.Shopping,
+                x.Religion
+
+            });
 
 
             return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "旅行計畫修改成功" });

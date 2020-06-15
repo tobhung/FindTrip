@@ -234,7 +234,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     {
                         y.Cpicture
 
-
                     })
 
                 });
@@ -413,8 +412,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             return Request.CreateResponse(HttpStatusCode.NoContent);
         }
 
-        // POST: api/ApiOrders
-        //[ResponseType(typeof(Order))]
+        //create travel plan
         [JwtAuthFilter]
         [Route("create")]
         public HttpResponseMessage PostOrder(Order order)
@@ -429,9 +427,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, new {success = false, message = "旅行計畫不得為空值"});
             }
 
-
-
-      
             var member = db.Members.Find(Mid);
             TravelPlan travel = new TravelPlan();
             order.MemberId = Mid;
@@ -439,8 +434,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             order.Status = 1;
 
 
-
-            var result1 = String.Join("", order.DepartureTime1); // why doesn't it split?
+            var result1 = String.Join("", order.DepartureTime1); // why doesn't it split?, and this doesn't work
 
             var planner = db.TravelPlans.Find(order.TravelPlan_id);
             order.PlannerId = planner.MemberId;
@@ -456,7 +450,8 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             order.PointsLeft = currentPoints;
             member.points = currentPoints;
-
+            
+            
 
 
             db.Orders.Add(order);
@@ -497,20 +492,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         }
         
 
-        public string ConvertStringArrayToString(string[] DepartureTime1)
-        {
-            //
-            // Concatenate all the elements into a StringBuilder.
-            //
-            StringBuilder sb = new StringBuilder();
-            foreach (string value in DepartureTime1)
-            {
-                sb.Append(value);
-                sb.Append(' ');
-            }
-
-            return sb.ToString();
-        }
 
         // DELETE: api/ApiOrders/5
         //[ResponseType(typeof(Order))]

@@ -105,7 +105,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             if (OrderComment.MemberId != Mid)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new { success = false, message = "非訂購人員，無法評論" });
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { success = false, message = "非訂購人，無法評論" });
             }
 
             if (OrderComment.Status != 3)
