@@ -14,7 +14,7 @@ using FindTrip_Web.Security;
 namespace FindTrip_Web.Areas.Admin.Controllers
 {
     [RoutePrefix("api/wish")]
-    public class WishBoardsController : ApiController
+    public class ApiWishBoardsController : ApiController
     {
         private Model1 db = new Model1();
 

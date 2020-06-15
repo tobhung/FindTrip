@@ -294,7 +294,7 @@
     <Compile Include="Areas\Admin\Controllers\DefaultController.cs" />
     <Compile Include="Areas\Admin\Controllers\MembersController.cs" />
     <Compile Include="Areas\Admin\Controllers\ApiPointsHistoriesController.cs" />
-    <Compile Include="Areas\Admin\Controllers\WishBoardsController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ApiWishBoardsController.cs" />
     <Compile Include="common\AbstractPatchStateRequest.cs" />
     <Compile Include="common\AbstractPatchValidator.cs" />
     <Compile Include="common\CustomBinding.cs" />

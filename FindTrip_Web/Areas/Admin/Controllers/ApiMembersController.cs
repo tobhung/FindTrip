@@ -91,7 +91,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             if (check.Permission == "02")
             {
-                var result2 = db.Members.Where(x => x.id == Mid).Select(x => new
+                var result = db.Members.Where(x => x.id == Mid).Select(x => new
                 {
                     x.id,
                     x.name,
@@ -103,7 +103,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.Email
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, result2 });
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, result });
 
             }
 
@@ -143,7 +143,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 db.Entry(member).State = EntityState.Modified;
                 db.SaveChanges();
 
-                var result1 = db.Members.Where(x => x.id == Mid).Select(x => new
+                var result = db.Members.Where(x => x.id == Mid).Select(x => new
                 {
                     x.id,
                     x.name,
@@ -156,7 +156,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
                 //string result = JsonConvert.DeserializeObject<PatchMember>(result1).ToString();
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "成功修改", result1 });
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "成功修改", result });
 
             }
 
@@ -169,7 +169,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 db.Entry(member).State = EntityState.Modified;
                 db.SaveChanges();
 
-                var result2 = db.Members.Where(x => x.id == Mid).Select(x => new
+                var result = db.Members.Where(x => x.id == Mid).Select(x => new
                 {
                     x.id,
                     x.name,
@@ -184,7 +184,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "規劃師成功修改", result2 });
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "規劃師成功修改", result });
 
             }
 
@@ -252,7 +252,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 //db.Entry(member).State = EntityState.Modified;
                 db.SaveChanges();
 
-                var result2 = db.Members.Where(x => x.id == Mid).Select(x => new
+                var result = db.Members.Where(x => x.id == Mid).Select(x => new
                 {
                     x.id,
                     x.Email,
@@ -269,7 +269,16 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.manpic
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = " 規劃師修改成功", result2 });
+                var result1 = new
+                {
+                    member.id,
+                    member.Email,
+                    member.name
+
+                };
+         
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = " 規劃師修改成功", result });
 
             }
 

@@ -43,8 +43,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             return db.Messages;
         }
 
-        //// GET: api/ApiMessages/5
-        //[ResponseType(typeof(Message))]
+
         [JwtAuthFilter]
      
         public HttpResponseMessage GetMessage (Message message)
@@ -68,8 +67,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        // PUT: api/ApiMessages/5
-        [ResponseType(typeof(void))]
+
         public IHttpActionResult PutMessage(int id, Message message)
         {
             if (!ModelState.IsValid)
@@ -103,8 +101,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        //// POST: api/ApiMessages
-        //[ResponseType(typeof(Message))]
         //this is when buyer click on product to send msg to seller
         [JwtAuthFilter]
         [Route("send")]

@@ -334,7 +334,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
                 db.SaveChanges();
 
-                var result1 = db.Orders.Where(x => x.id == id).Select(x => new
+                var result = db.Orders.Where(x => x.id == id).Select(x => new
                 {
                     x.id,
                     x.MemberId,
@@ -360,7 +360,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.Religion
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message="委任中", result1});
+                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message="委任中", result});
             }
 
             if (orderConfirm.Status == 2)
@@ -377,7 +377,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 db.SaveChanges();
 
 
-                var result2 = db.Orders.Where(x => x.id == id).Select(x => new
+                var result = db.Orders.Where(x => x.id == id).Select(x => new
                 {
                     x.id,
                     x.MemberId,
@@ -401,7 +401,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.Religion
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message="已完成", result2});
+                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message="已完成", result});
             }
 
             if (orderConfirm.Status == 3)
