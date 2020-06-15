@@ -71,21 +71,21 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             if (check.Permission == "01")
             {
 
-            
-            var result = db.Members.Where(x => x.id == Mid).Select(x => new
-            {
-                x.id,
-                x.name,
-                x.points,
-                x.manpic,
-                x.MemberIntro,
-                x.Tel,
-                x.PlannerSocial1,
-                x.PlannerSocial2,
-                x.Email
-            });
 
-            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, result });
+                var result = db.Members.Where(x => x.id == Mid).Select(x => new
+                {
+                    x.id,
+                    x.name,
+                    x.points,
+                    x.manpic,
+                    x.MemberIntro,
+                    x.Tel,
+                    x.PlannerSocial1,
+                    x.PlannerSocial2,
+                    x.Email
+                });
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, result });
 
             }
 
@@ -103,17 +103,17 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.Email
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, result2});
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, result2 });
 
             }
 
             //string newResult = JsonConvert.SerializeObject(result);
             // HttpContext.Current.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
             //return Request.CreateResponse(HttpStatusCode.NoContent);
-            return Request.CreateResponse(HttpStatusCode.NoContent, new {messaage = "沒東西啦"});
+            return Request.CreateResponse(HttpStatusCode.NoContent, new { messaage = "沒東西啦" });
         }
 
-  
+
 
 
         // GET: api/ApiMembers/5
@@ -137,33 +137,36 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             if (member.Permission == "01")
             {
 
-            patchMember.Password = Utility.GenerateHashWithSalt(patchMember.Password, member.PasswordSalt);
-            patchMember.Patch(member);
-
-            db.SaveChanges();
-
-            var result1 = db.Members.Where(x => x.id == Mid).Select(x => new
-            {
-                x.id,
-                x.name,
-                x.Tel,
-                x.MemberIntro,
-                x.PlannerSocial1,
-                x.PlannerSocial2,
-
-            });
-
-            //string result = JsonConvert.DeserializeObject<PatchMember>(result1).ToString();
-
-            return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "成功修改", result1});
-
-            }
-
-            if(member.Permission == "02")
-            {
                 patchMember.Password = Utility.GenerateHashWithSalt(patchMember.Password, member.PasswordSalt);
                 patchMember.Patch(member);
 
+                db.Entry(member).State = EntityState.Modified;
+                db.SaveChanges();
+
+                var result1 = db.Members.Where(x => x.id == Mid).Select(x => new
+                {
+                    x.id,
+                    x.name,
+                    x.Tel,
+                    x.MemberIntro,
+                    x.PlannerSocial1,
+                    x.PlannerSocial2,
+
+                });
+
+                //string result = JsonConvert.DeserializeObject<PatchMember>(result1).ToString();
+
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "成功修改", result1 });
+
+            }
+
+            if (member.Permission == "02")
+            {
+
+                member.name = patchMember.name;
+                patchMember.Password = Utility.GenerateHashWithSalt(patchMember.Password, member.PasswordSalt);
+                patchMember.Patch(member);
+                db.Entry(member).State = EntityState.Modified;
                 db.SaveChanges();
 
                 var result2 = db.Members.Where(x => x.id == Mid).Select(x => new
@@ -181,11 +184,11 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "規劃師成功修改", result2});
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "規劃師成功修改", result2 });
 
             }
 
-            return Request.CreateResponse(HttpStatusCode.NoContent, new {message = "沒東西R"});
+            return Request.CreateResponse(HttpStatusCode.NoContent, new { message = "沒東西R" });
 
         }
 
@@ -227,7 +230,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "旅行家修改成功", result});
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "旅行家修改成功", result });
             }
 
             if (change.Permission == "02")
@@ -266,7 +269,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.manpic
                 });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = " 規劃師修改成功", result2});
+                return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = " 規劃師修改成功", result2 });
 
             }
 
@@ -344,7 +347,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
 
         [JwtAuthFilter]
-        [HttpPost]
         [Route("bgimg")]
         public HttpResponseMessage PostBackgroundImage()
         {
@@ -411,7 +413,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         }
 
 
-        [HttpPost]
         [Route("MemberLogin")]
         public HttpResponseMessage MemberLogin(ViewLogin viewLogin)
         {
@@ -421,7 +422,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
                 string jwtToken = jwtAuthUtil.GenerateToken(member.id, member.Email);
 
-              
+
                 return Request.CreateResponse(HttpStatusCode.OK,
                     new { success = true, message = "登入成功", token = jwtToken, member.points, member.Permission, member.id, member.Email });
                 //return Request.CreateResponse(HttpStatusCode.OK,
@@ -448,8 +449,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         }
 
         //[AllowCrossSiteJson]
-        [AllowAnonymous]
-        [HttpPost]
         [Route("Register")]
         public IHttpActionResult PostMember(Member member)
         {
@@ -496,7 +495,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
 
         [JwtAuthFilter]
-        [HttpPost]
         [Route("topup")]
         public HttpResponseMessage RechargePoints(PointsHistory pointsHistory)
         {

@@ -133,7 +133,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null? 0: 1,
                
 
-            }).Take(20);
+            }).Take(6);
 
             return Request.CreateResponse(HttpStatusCode.OK, new { success = true, allPlans, countries });
 
