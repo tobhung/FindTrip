@@ -172,39 +172,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             string token = Request.Headers.Authorization.Parameter;
             JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
             int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
-         
-            //var result = db.TravelPlans.Where(x => x.MemberId == Mid).Select(x => new
-            //{
-            //    Order = db.Orders.Where(y => y.TravelPlan_id == x.id&&y.Status==EnumList.OrderStatus.未確認).Select(y => new
-            //    {
-            //        y.id,
-            //        y.MyMember.Email,
-            //        y.MyMember.Tel,
-            //        y.MyMember.name,
-            //        y.Adult, 
-            //        y.Children,
-            //        y.DepartureTime1,
-            //        y.DepartureTime2,
-            //        y.country,
-            //        y.city,
-            //        y.CreateOn,
-            //        y.Status,
-            //        y.Remark,
-            //        y.Act,
-            //        y.Culture,
-            //        y.Food,
-            //        y.Shopping,
-            //        y.Secret,
-            //        y.Religion
-
-            //    //    Cpicture = y.MyMember.TravelPlans.Where(z => z.id == y.TravelPlan_id).Select(z => new
-            //    //    {
-            //    //    z.Cpicture
-            //    //}),
-            //    })
-
-            //});
-
+            
 
             var result = db.Orders.Where(x => x.PlannerId == Mid).Select(x =>
                 new

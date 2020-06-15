@@ -25,7 +25,7 @@ namespace FindTrip_Web.Hubs
         //傳送訊息給某人
         public void SendOne(string id, string message)
         {
-            var from = Users.ConnectionIds.Where(u => u.Key == Context.ConnectionId).FirstOrDefault();
+            var from = Users.ConnectionIds.FirstOrDefault(u => u.Key == Context.ConnectionId);
             //var to = Users.ConnectionIds.Where(u => u.Key == id).FirstOrDefault();
 
             Clients.Client(id).show("<span style='color:red'>" + from.Value + "密你:" + message + "</span>");
