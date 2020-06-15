@@ -19,7 +19,6 @@ using System.Web.Http.Results;
 using FindTrip_Web.Models;
 using FindTrip_Web.Security;
 using Microsoft.Ajax.Utilities;
-using System.Web.Http.Results;
 using System.Web.Security;
 using Newtonsoft.Json;
 using Member = FindTrip_Web.Models.Member;
@@ -96,6 +95,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.id,
                     x.name,
                     x.manpic,
+                    x.points,
                     x.MemberIntro,
                     x.Tel,
                     x.PlannerSocial1,
@@ -417,7 +417,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 throw;
             }
 
-            return Request.CreateResponse();
 
         }
 
@@ -475,7 +474,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             };
             Uri defaultImgUri = uriBuilder.Uri;
             member.manpic = defaultImgUri.ToString();
-            string img = "http://findtrip.rocket-coding.com:80/Upload/Userimg/20200601054121.jpg";
+            //string img = "http://findtrip.rocket-coding.com:80/Upload/Userimg/20200601054121.jpg";
             UriBuilder ub = new UriBuilder();
             member.PasswordSalt = Utility.CreateSalt();
             member.Password = Utility.GenerateHashWithSalt(member.Password, member.PasswordSalt);

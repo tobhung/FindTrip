@@ -22,7 +22,6 @@ using System.Web.Http.Results;
 using FindTrip_Web.Models;
 using FindTrip_Web.Security;
 using Microsoft.Ajax.Utilities;
-using System.Web.Http.Results;
 using System.Web.Security;
 using System.Web.UI.WebControls;
 using Newtonsoft.Json;

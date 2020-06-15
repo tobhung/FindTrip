@@ -22,7 +22,6 @@ using System.Web.Http.Results;
 using FindTrip_Web.Models;
 using FindTrip_Web.Security;
 using Microsoft.Ajax.Utilities;
-using System.Web.Http.Results;
 using System.Web.Security;
 using Newtonsoft.Json;
 using TravelPlan = FindTrip_Web.Models.TravelPlan;
@@ -68,7 +67,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 },
 
                 rating = db.Ratings.Count(y => y.TravelId == x.id),
-                star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null ? 0 : 1,
+                star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null ? 0 : db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
 
 
             });
@@ -130,7 +129,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 },
 
                 rating = db.Ratings.Count(y => y.TravelId == x.id),
-                star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null? 0: 1,
+                star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null? 0: db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
                
 
             }).Take(6);
@@ -469,7 +468,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             if (postedFile != null && postedFile.ContentLength > 0)
             {
                 //string extension = postedFile.FileName.Split('.')[postedFile.FileName.Split('.').Length - 1];
-                int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
+                //int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
                 string fileName = Utility.UploadPlanBGImage(postedFile);
                 //IList<string> AllowedFileExtensions = new List<string> {".jpg", ".png", ".svg"};
 
@@ -533,7 +532,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             if (postedFile != null && postedFile.ContentLength > 0)
             {
                 //string extension = postedFile.FileName.Split('.')[postedFile.FileName.Split('.').Length - 1];
-                int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
+                //int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
                 string fileName = Utility.UploadPlanCYImage(postedFile);
                 //IList<string> AllowedFileExtensions = new List<string> {".jpg", ".png", ".svg"};
 

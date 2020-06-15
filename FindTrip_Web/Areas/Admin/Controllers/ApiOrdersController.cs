@@ -23,7 +23,6 @@ using System.Web.Http.Results;
 using FindTrip_Web.Models;
 using FindTrip_Web.Security;
 using Microsoft.Ajax.Utilities;
-using System.Web.Http.Results;
 using System.Web.Security;
 using Newtonsoft.Json;
 using TravelPlan = FindTrip_Web.Models.TravelPlan;
@@ -313,6 +312,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+
         [JwtAuthFilter]
         [Route("update/{id}")] //planner send confirmation back
         public HttpResponseMessage PatchOrder(int id, Order order)
@@ -322,13 +322,15 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
 
             var seller = db.Members.Find(Mid);
+
             if (seller.Permission != "02")
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             var orderConfirm = db.Orders.Find(id);
-            if (orderConfirm.Status ==1)
+
+            if (orderConfirm.Status == 1)
             {
                 orderConfirm.Status = order.Status;
 
@@ -363,9 +365,9 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message="委任中", result});
             }
 
-            if (orderConfirm.Status == 2)
+            if (orderConfirm.Status == 2) 
             {
-               
+
                 orderConfirm.Status = order.Status;
                 //var member = db.Members.Find(orderConfirm.PlannerId);
                 //var planPoints = db.TravelPlans.Find(orderConfirm.PlannerId);
@@ -409,7 +411,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                     new {success = false, message = "訂單已完成，無須任何動作"});
             }
-            return Request.CreateResponse(HttpStatusCode.NoContent);
+            return Request.CreateResponse(HttpStatusCode.NoContent, new {message ="????????"});
         }
 
         //create travel plan

@@ -10,6 +10,8 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using FindTrip_Web.Models;
 using FindTrip_Web.Security;
+using WishBoard = FindTrip_Web.Models.WishBoard;
+using WishBoardReply = FindTrip_Web.Models.WishBoardReply;
 
 namespace FindTrip_Web.Areas.Admin.Controllers
 {
@@ -39,7 +41,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             }).Take(5);
 
             return Request.CreateResponse(HttpStatusCode.OK,
-                new {success = true, message = "can view all now", result});
+                new { success = true, message = "can view all now", result });
 
         }
 
@@ -102,7 +104,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             var result = db.WishBoards.Where(x => x.MemberId == Mid).Select(x => new
             {
                 x.id,
-                MemberId =  x.MyMember.id,
+                MemberId = x.MyMember.id,
                 x.MyMember.manpic,
                 x.MyMember.name,
                 x.Comment1,
@@ -111,7 +113,42 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             });
 
-            return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "留言成功", result});
+            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "留言成功", result });
+        }
+
+
+        [JwtAuthFilter]
+        [Route("reply")]
+        public HttpResponseMessage PostWishBoardReply(WishBoardReply wishBoardReply)
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            wishBoardReply.MemberId = Mid;
+            wishBoardReply.CreateOn = DateTime.Now;
+
+            db.WishBoardReplies.Add(wishBoardReply);
+            db.SaveChanges();
+
+            var result = db.WishBoardReplies.Where(x => x.MemberId == Mid).Select(x => new
+            {
+                x.id,
+                x.Rid,
+                MemberId = x.MyMember.id,
+                x.MyMember.manpic,
+                x.MyMember.name,
+                x.NewComment,
+                x.CreateOn
+
+            });
+
+            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "留言成功", result });
         }
 
 

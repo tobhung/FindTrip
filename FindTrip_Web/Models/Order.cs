@@ -43,7 +43,9 @@ namespace FindTrip_Web.Models
         public int TravelPlan_id { get; set; }
 
         public int PlannerId { get; set; }
-        public int Status { get; set;  }
+        public int Status { get; set; }
+
+   
         //public EnumList.OrderStatus Status { get; set; }
 
         public bool Act { get; set; }
