@@ -6,6 +6,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using FindTrip_Web.Models;
@@ -31,19 +32,83 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         [Route("all")]
         public HttpResponseMessage GetWishBoard()
         {
-            var result = db.WishBoards.OrderBy(x => x.CreateOn).Select(x => new
+            var result = db.WishBoards.OrderBy(w => w.CreateOn).Select(w => new
             {
-                x.id,
-                x.MyMember.name,
-                x.MyMember.manpic,
-                x.Comment1,
-                x.Comment2,
-            }).Take(5);
+                w.id,
+                w.MyMember.name,
+                w.MyMember.manpic,
+                w.Comment1,
+                w.Comment2,
+                CommentTotal = db.WishBoardReplies.Count(y => y.Rid == w.id),
+                w.LikeTotal,
+
+            });
 
             return Request.CreateResponse(HttpStatusCode.OK,
                 new { success = true, message = "can view all now", result });
 
+        }//許願版內頁
+        [Route("inner/{Wid}")]
+        public HttpResponseMessage GetSWishBoard(int Wid)
+        {
+            var wish = db.WishBoards.Find(Wid);
+
+
+            var result = new
+            {
+                wish.id,
+                wish.MyMember.name,
+                wish.MyMember.manpic,
+                wish.Comment1,
+                wish.Comment2,
+                CommentTotal = db.WishBoardReplies.Count(y => y.Rid == Wid),
+                wish.CreateOn,
+                
+                wishReply = db.WishBoardReplies.Where(y=>y.Rid==Wid).Select(y=>new
+                {
+                    y.id,
+                    y.MyMember.name,
+                    y.MyMember.manpic,
+                    y.NewComment,
+                    y.CreateOn
+                })
+            };
+
+            //var wishReply = db.WishBoardReplies.Where(y => y.Rid == Wid).FirstOrDefault();
+
+            //var result2 = new
+            //{
+            //    wishReply.MyMember.name,
+            //    wishReply.MyMember.manpic,
+            //    wishReply.NewComment,
+
+            //};
+
+
+
+            //var result = db.WishBoardReplies.Where(x => x.Rid == Wid).Select(x => new
+            //{
+            //    WishBoardId = x.MyWishBoard.id,
+            //    MainName= x.MyWishBoard.MyMember.name,
+            //    MainPic= x.MyWishBoard.MyMember.manpic,
+            //    x.MyWishBoard.Comment1,
+            //    x.MyWishBoard.Comment2,
+            //    MainCreateOn = x.MyWishBoard.CreateOn,
+            //    CommentTotal = db.WishBoardReplies.Count(y => y.Rid == Wid),
+            //    x.Like,
+
+            //    x.id,
+            //    ReplyName= x.MyMember.name,
+            //    ReplyPic = x.MyMember.manpic,
+            //    x.NewComment,
+            //    ReplyCreateOn = x.CreateOn
+
+            //});
+
+            return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "單筆許願版內頁", result});
+
         }
+
 
         // PUT: api/WishBoards/5
         [ResponseType(typeof(void))]
@@ -97,6 +162,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             wishBoard.MemberId = Mid;
             wishBoard.CreateOn = DateTime.Now;
+            
 
             db.WishBoards.Add(wishBoard);
             db.SaveChanges();
@@ -104,12 +170,13 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             var result = db.WishBoards.Where(x => x.MemberId == Mid).Select(x => new
             {
                 x.id,
-                MemberId = x.MyMember.id,
+                MemberId = Mid,
                 x.MyMember.manpic,
                 x.MyMember.name,
                 x.Comment1,
                 x.Comment2,
-                x.CreateOn
+                x.CreateOn,
+                //LikeTotal = db.WishBoardReplies.Where(y=>y.MemberId == Mid)
 
             });
 
@@ -133,6 +200,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             wishBoardReply.MemberId = Mid;
             wishBoardReply.CreateOn = DateTime.Now;
 
+
             db.WishBoardReplies.Add(wishBoardReply);
             db.SaveChanges();
 
@@ -144,13 +212,78 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 x.MyMember.manpic,
                 x.MyMember.name,
                 x.NewComment,
-                x.CreateOn
+                x.CreateOn,
 
             });
 
             return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "留言成功", result });
         }
 
+
+     
+        [Route("wimg")]
+        public HttpResponseMessage PostBackgroundImage()
+        {
+            //string token = Request.Headers.Authorization.Parameter;
+            //JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            //int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+            //Member member = db.Members.Find(Mid);
+
+            try
+            {
+                var postedFile = HttpContext.Current.Request.Files.Count > 0
+                    ? HttpContext.Current.Request.Files[0]
+                    : null;
+                if (postedFile != null && postedFile.ContentLength > 0)
+                {
+                    //string extension = postedFile.FileName.Split('.')[postedFile.FileName.Split('.').Length - 1];
+                    //int MaxContentLength = 1024 * 1024 * 1; //Size = 1MB
+                    string fileName = Utility.UploadImage(postedFile);
+                    //IList<string> AllowedFileExtensions = new List<string> {".jpg", ".png", ".svg"};
+
+                    //if (!AllowedFileExtensions.Contains(extension))
+                    //{
+                    //    return Request.CreateResponse(HttpStatusCode.BadRequest, new
+                    //    {
+                    //        success = false,
+                    //        message = "請上傳圖片正確格式，可接受格式為 .jpg, .png, .svg"
+                    //    });
+                    //}
+
+                    UriBuilder uriBuilder = new UriBuilder(HttpContext.Current.Request.Url)
+                    {
+                        Path = $"/Upload/Wimg/{fileName}"
+                    };
+                    //Userimage myfolder name where i want to save my image
+                    Uri imgUploadUrl = uriBuilder.Uri;
+                    string Img = imgUploadUrl.ToString();
+
+                    //db.Entry(wishboard).State = EntityState.Modified;
+                    //db.SaveChanges();
+
+                    return Request.CreateResponse(HttpStatusCode.OK, new
+                    {
+                        success = true,
+                        message = "已上傳圖片",
+                        Img
+                    });
+
+                }
+
+                return Request.CreateResponse(HttpStatusCode.NotFound, new
+                {
+                    success = false,
+                    message = "無圖片，請選擇圖片上傳"
+                });
+
+            }
+            catch
+            {
+                throw;
+            }
+
+
+        }
 
 
         // DELETE: api/WishBoards/5

@@ -70,7 +70,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             if (check.Permission == "01")
             {
 
-
                 var result = db.Members.Where(x => x.id == Mid).Select(x => new
                 {
                     x.id,
@@ -100,6 +99,11 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.Tel,
                     x.PlannerSocial1,
                     x.PlannerSocial2,
+                    x.PlannerName,
+                    x.PlannerIntro,
+                    x.PlannerTel,
+                    x.PlannerSocial3,
+                    x.PlannerSocial4,
                     x.Email
                 });
 
@@ -328,6 +332,8 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     //Userimage myfolder name where i want to save my image
                     Uri imageUrl = uriBuilder.Uri;
                     member.manpic = imageUrl.ToString();
+                    member.id = Mid;
+
 
                     db.Entry(member).State = EntityState.Modified;
                     db.SaveChanges();

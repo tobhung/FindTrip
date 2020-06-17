@@ -42,9 +42,9 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             
         //search function for index page
         [Route("search")]
-        public HttpResponseMessage GetSearchPlans( string search)
+        public HttpResponseMessage GetSearchPlans(string search)
         {
-            var result = db.TravelPlans.Where(x => x.country.Contains(search)|| x.city.Contains(search)).Select(x => new
+            var result = db.TravelPlans.Where(x => x.country.Contains(search)|| x.city.Contains(search) || x.Act == true || x.Culture == true || x.Food == true || x.Religion == true ||x.Secret == true || x.Shopping == true).Select(x => new
             {
                 x.id,
                 x.MemberId,
@@ -98,20 +98,13 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         {
             Countries country = new Countries();
 
-            var countries = db.Countries.Select(c => new
-            {
-                c.id,
-                c.country,
-                city = c.Districts.Where(d => d.Cid == c.id).Select(d => d.city)
-            });
-
-            var allPlans = db.TravelPlans.OrderByDescending(x=>x.CreateOn).
-                Select(x => new
+            var countries = db.TravelPlans.Select(c => c.country);
+            var allPlans = db.TravelPlans.Select(x => new
             {
                 x.id,
                 x.MemberId,
                 x.points,
-                Cpicture = x.Cpicture,
+                x.TPBGImg,
                 x.MyMember.manpic,
                 x.MyMember.name,
                 x.country,
@@ -129,12 +122,27 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 },
 
                 rating = db.Ratings.Count(y => y.TravelId == x.id),
-                star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null? 0: db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
-               
+                star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null
+                    ? 0
+                    : db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
 
-            }).Take(6);
 
-            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, allPlans, countries });
+
+            });
+
+
+            var wishboard = db.WishBoards.OrderBy(w => w.CreateOn).Select(w => new
+            {
+                w.id,
+                w.MyMember.name,
+                w.MyMember.manpic,
+                w.Comment1,
+                w.Comment2,
+                w.LikeTotal,
+
+            });
+
+            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, allPlans, countries, wishboard });
 
         }
 
@@ -202,7 +210,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             Member member = db.Members.Find(Mid);
 
-            var result = db.TravelPlans.Where(x=>x.MemberId == Mid).Select(x=>new
+            var result = db.TravelPlans.Where(x=>x.MemberId == Mid).OrderByDescending(x=>x.CreateOn).Select(x=>new
             {
                 id = x.id,
                 MemberId = x.MyMember.id,

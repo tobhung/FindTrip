@@ -89,7 +89,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         }
 
         // POST: api/ApiMessageReplies
-        [ResponseType(typeof(MessageReply))]
+        [JwtAuthFilter]
         public HttpResponseMessage PostMessageReply(MessageReply messageReply)
         {
             string token = Request.Headers.Authorization.Parameter;
@@ -101,16 +101,9 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var msg = db.Messages.Find(messageReply.MessageId);
-            msg.PlannerId = Mid; 
-            
+            messageReply.MemberId = Mid;
 
 
-
-            
-            
-            
-            
 
             db.MessageReplies.Add(messageReply);
             db.SaveChanges();

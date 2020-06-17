@@ -11,10 +11,12 @@ namespace FindTrip_Web.Models
         public int  id { get; set; }
 
         public int MessageId { get; set; }
-        [ForeignKey("MessageId")]
-        public virtual Message MyMessage{ get; set; }
+        //[ForeignKey("MessageId")]
+        //public virtual Message MyMessage{ get; set; }
 
-        public int BuyerId { get; set; }
+        public int MemberId { get; set; }
+        [ForeignKey("MemberId")]
+        public virtual Member MyMember { get; set; }
 
         public int TravelPlanId { get; set;  }
 

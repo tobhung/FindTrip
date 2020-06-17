@@ -15,6 +15,8 @@ namespace FindTrip_Web.Models
         public string Subject { get; set; }
         public string Body { get; set; }
         public int MemberId { get; set; }
+        [ForeignKey("MemberId")]
+        public virtual Member MyMember { get; set; }
 
         public int TravelPlanId { get; set; }
         public int PlannerId { get; set; }
@@ -24,7 +26,7 @@ namespace FindTrip_Web.Models
         public DateTime CreateOn { get; set;  }
         //private ICollection<Member> Members { get; set; }
 
-        public virtual ICollection<MessageReply> MessageReplies { get; set; }
+        //public virtual ICollection<MessageReply> MessageReplies { get; set; }
 
 
     }

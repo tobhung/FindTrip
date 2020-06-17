@@ -36,6 +36,44 @@ namespace FindTrip_Web.Areas.Admin.Controllers
     {
         private Model1 db = new Model1();
 
+
+        [JwtAuthFilter]
+        [Route("all")]
+        public HttpResponseMessage GetAllMsg()
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+
+            var msg = db.Messages.Find(Mid);
+           
+
+            //if (msg.MemberId != Mid)
+            //{
+            //    return Request.CreateResponse(HttpStatusCode.BadRequest, new {success = false, message = "這人不對R"});
+            //}
+
+            var result = new
+            {
+                msg.id,
+                msg.MemberId,
+                msg.Body,
+                buyerName = msg.MyMember.name,
+                buyerPic = msg.MyMember.manpic,
+
+                reply = db.MessageReplies.Where(y => y.PlannerId == Mid).Select(y => new
+                {
+                    y.id,
+                    y.MyMember.name,
+                    y.MyMember.manpic,
+                    y.MessageContent
+
+                })
+            };
+
+            return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "全部訊息", result});
+
+        }
         // GET: api/ApiMessages
         public IQueryable<Message> GetMessages()
         {
@@ -44,8 +82,8 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
 
         [JwtAuthFilter]
-     
-        public HttpResponseMessage GetMessage (Message message)
+
+        public HttpResponseMessage GetMessage(Message message)
         {
             string token = Request.Headers.Authorization.Parameter;
             JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
@@ -112,13 +150,13 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             if (message.TravelPlanId == 0)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
-                    new {success = false, message = "no such plan exists"});
+                    new { success = false, message = "no such plan exists" });
             }
             TravelPlan travelPlan = new TravelPlan();
             message.CreateOn = DateTime.Now;
             var planner = db.TravelPlans.Find(message.TravelPlanId);
             message.PlannerId = planner.MemberId;
-            message.MemberId = Mid; 
+            message.MemberId = Mid;
 
 
             db.Messages.Add(message);
@@ -126,17 +164,72 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             var result = db.Messages.Where(x => x.TravelPlanId == planner.id).Select(x => new
             {
-                x.id,
+                MessageId=  x.id,
                 x.TravelPlanId,
                 x.Body,
                 x.CreateOn,
                 buyer = message.MemberId,
                 seller = message.PlannerId
-                
+
             });
 
-            return Request.CreateResponse(HttpStatusCode.OK, new {success= true, message="訊息傳送成功", result});
+            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "訊息傳送成功", result });
         }
+
+
+
+        //
+        [JwtAuthFilter]
+        [Route("reply")]
+        public HttpResponseMessage PostMessageReply(MessageList messageList)
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            //var idCheck = db.Messages.Find(Mid);
+            //if (Mid == idCheck.MemberId)
+            //{
+            //    return Request.CreateResponse(HttpStatusCode.BadRequest, new {message = "自己不能傳訊給自己R"});
+            //}
+
+            messageList.MemberId = Mid;
+            messageList.CreateOn = DateTime.Now;
+
+            //db.MessageReplies.Add(MessageList);
+            db.MessageLists.Add(messageList);
+            db.SaveChanges();
+
+
+            var result = db.MessageLists.Where(x => x.MemberId == Mid).Select(x => new
+            {
+                x.id,
+                x.MessageId,
+                x.MemberId,
+                x.MyMember.name,
+                x.MyMember.manpic,
+                x.MessageContent
+
+            });
+            //var result = new
+            //{
+            //    messageReply.id,
+            //    messageReply.MyMember.name,
+            //    messageReply.MyMember.manpic,
+            //    messageReply.MessageContent,
+            //};
+
+            return Request.CreateResponse(HttpStatusCode.OK, new { success= true, message="留言成功", result});
+        }
+
+
+
+
 
         [JwtAuthFilter]
         [Route("receive")]
@@ -145,6 +238,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             string token = Request.Headers.Authorization.Parameter;
             JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
             int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
+
 
             var sellerCheck = db.Messages.Find(Mid);
             message.PlannerId = Mid;
@@ -158,11 +252,43 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 buyer = x.MemberId
             });
 
-            return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "賣家獲得所有訊息", result});
+            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "賣家獲得所有訊息", result });
 
         }
 
+        //[JwtAuthFilter]
+        //[Route("all")]
+        //public HttpResponse GetAllMessage()
+        //{
+        //    string token = Request.Headers.Authorization.Parameter;
+        //    JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+        //    int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
 
+        //    var msg = db.Messages.Find(Mid);
+
+
+        //    var result = new
+        //    {
+        //        wish.id,
+        //        wish.MyMember.name,
+        //        wish.MyMember.manpic,
+        //        wish.Comment1,
+        //        wish.Comment2,
+        //        CommentTotal = db.WishBoardReplies.Count(y => y.Rid == Wid),
+        //        wish.CreateOn,
+
+        //        wishReply = db.WishBoardReplies.Where(y => y.Rid == Wid).Select(y => new
+        //        {
+        //            y.id,
+        //            y.MyMember.name,
+        //            y.MyMember.manpic,
+        //            y.NewComment,
+        //            y.CreateOn
+        //        })
+        //    };
+
+
+        //}
         // DELETE: api/ApiMessages/5
         [ResponseType(typeof(Message))]
         public IHttpActionResult DeleteMessage(int id)

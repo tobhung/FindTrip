@@ -13,7 +13,8 @@ namespace FindTrip_Web.Models
        
         public int id { get; set; }
 
-        [MaxLength(200)]
+        public int OrderId { get; set; }
+        public virtual  Order MyOrder { get; set; }
         public string RatingContent { get; set; }
 
         public int MemberId { get; set; }

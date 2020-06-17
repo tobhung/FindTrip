@@ -396,6 +396,22 @@
     <Compile Include="Migrations\202006150851209_UpdateOrdersss.Designer.cs">
       <DependentUpon>202006150851209_UpdateOrdersss.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006151459065_UpdateRating2.cs" />
+    <Compile Include="Migrations\202006151459065_UpdateRating2.Designer.cs">
+      <DependentUpon>202006151459065_UpdateRating2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006170004470_UpdateWishBoardReply.cs" />
+    <Compile Include="Migrations\202006170004470_UpdateWishBoardReply.Designer.cs">
+      <DependentUpon>202006170004470_UpdateWishBoardReply.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006170549048_UpdateMessage.cs" />
+    <Compile Include="Migrations\202006170549048_UpdateMessage.Designer.cs">
+      <DependentUpon>202006170549048_UpdateMessage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006170649498_UpdateMessageList.cs" />
+    <Compile Include="Migrations\202006170649498_UpdateMessageList.Designer.cs">
+      <DependentUpon>202006170649498_UpdateMessageList.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Countries.cs" />
     <Compile Include="Models\District.cs" />
@@ -546,6 +562,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006150851209_UpdateOrdersss.resx">
       <DependentUpon>202006150851209_UpdateOrdersss.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006151459065_UpdateRating2.resx">
+      <DependentUpon>202006151459065_UpdateRating2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006170004470_UpdateWishBoardReply.resx">
+      <DependentUpon>202006170004470_UpdateWishBoardReply.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006170549048_UpdateMessage.resx">
+      <DependentUpon>202006170549048_UpdateMessage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006170649498_UpdateMessageList.resx">
+      <DependentUpon>202006170649498_UpdateMessageList.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

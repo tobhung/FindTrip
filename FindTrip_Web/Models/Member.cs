@@ -89,6 +89,9 @@ namespace FindTrip_Web.Models
 
         public virtual ICollection<PointsHistory> PointsHistories { get; set;  }
 
+        public virtual ICollection<Message> Messages { get; set; }
+        public virtual ICollection<MessageList> MessageLists { get; set; }
+
 
 
     }

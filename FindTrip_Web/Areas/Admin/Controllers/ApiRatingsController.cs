@@ -93,25 +93,12 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         }
 
         [JwtAuthFilter]
-        [Route("single")]
-        public HttpResponseMessage PostRating(Rating rating)
+        [Route("test/single")]
+        public HttpResponseMessage PostRatings(Rating rating)
         {
             string token = Request.Headers.Authorization.Parameter;
             JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
             int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
-
-            var OrderComment = db.Orders.Find(Mid);
-
-            if (OrderComment.MemberId != Mid)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new { success = false, message = "非訂購人，無法評論" });
-            }
-
-            if (OrderComment.Status != 3)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                    new { success = false, message = "訂單尚未完成，無法評價" });
-            }
 
 
             rating.MemberId = Mid;
@@ -119,12 +106,10 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             //rating.Ratingtotal = db.Ratings.Where(x => x.id == OrderComment.TravelPlan_id).Sum(x => x.rating);
             //rating.StarAmount = db.Ratings.Where(x => x.id == OrderComment.TravelPlan_id).Average(x => x.star);
 
-
-
             db.Ratings.Add(rating);
             db.SaveChanges();
 
-            var result = db.Ratings.Where(x => x.id == rating.id).Select(x => new
+            var result = db.Ratings.Where(x => x.id == rating.id).Select(x =>  new
             {
                 x.id,
                 x.TravelId,
@@ -136,8 +121,49 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         }
 
 
+        [JwtAuthFilter]
+        [Route("single/{OrderId}")]
+        public HttpResponseMessage PostRating(int OrderId, Rating rating)
+        {
+            string token = Request.Headers.Authorization.Parameter;
+            JwtAuthUtil jwtAuthUtil = new JwtAuthUtil();
+            int Mid = Convert.ToInt32(jwtAuthUtil.GetId(token));
 
+            var orderCheck = db.Orders.Find(OrderId);
 
+            if (OrderId != orderCheck.id)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    new { success = false, message = "not buyer cannot leave comment" });
+            }
+
+            if (orderCheck.Status != 3)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    new { success = false, message = "訂單尚未完成，無法評價" });
+            }
+
+            rating.TravelId = orderCheck.TravelPlan_id;
+            rating.OrderId = orderCheck.id;
+            rating.MemberId = Mid;
+            rating.CreateOn = DateTime.Now;
+            //rating.Ratingtotal = db.Ratings.Where(x => x.id == OrderComment.TravelPlan_id).Sum(x => x.rating);
+            //rating.StarAmount = db.Ratings.Where(x => x.id == OrderComment.TravelPlan_id).Average(x => x.star);
+
+            db.Ratings.Add(rating);
+            db.SaveChanges();
+
+            var result = db.Ratings.Where(x => x.id == rating.id).Select(x => new
+            {
+                x.id,
+                x.TravelId,
+                x.rating,
+                x.star,
+                x.RatingContent
+            });
+
+            return Request.CreateResponse(HttpStatusCode.OK, new { success = true, message = "成功評論", result });
+        }
 
 
         // DELETE: api/ApiRatings/5

@@ -56,6 +56,7 @@ namespace FindTrip_Web.Models
 
         public bool Religion { get; set; }
 
-
+        public virtual ICollection<Rating> Ratings { get; set; }
     }
+
 }

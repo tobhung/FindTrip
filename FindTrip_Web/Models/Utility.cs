@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
@@ -145,7 +146,7 @@ namespace FindTrip_Web.Models
         /// </summary>
         /// <param name="upFile">HttpPostedFile 物件</param>
         /// <returns>儲存檔名</returns>
-        public static string UploadPlanCYImage(HttpPostedFile upFile )
+        public static string UploadPlanCYImage(HttpPostedFile upFile)
         {
             string fileName = Path.GetFileName(upFile.FileName);
             //取得副檔名
@@ -157,10 +158,42 @@ namespace FindTrip_Web.Models
             return fileName;
         }
         #endregion
+
+
+        #region 寄送系統通知信
+        public static void SendEmail(string Email)
+        {
+            string MessageBody = "尋旅 FINDTRIP 找回密碼，<br>" +
+                                 "主旨：" + "<br>" +
+                                 "維修單編號：" + "<br>" +
+                                 "<br>敬請撥冗查看，謝謝!";
+            //寄件者及名稱，可隨便填
+            MailAddress from = new MailAddress("goodbye.n.hello.again@gmail.com", "找回密碼");
+            //收件者，可寫多人，用逗號隔開
+            MailAddress to = new MailAddress(Email);
+            MailMessage message = new MailMessage(from, to);
+            message.Subject = $"[監視器報修系統自動通知信]";
+            message.SubjectEncoding = System.Text.Encoding.UTF8;
+            message.Body = MessageBody;
+            message.BodyEncoding = System.Text.Encoding.UTF8;
+            message.IsBodyHtml = true; //是否為html信件
+            //msg.Attachments.Add(new Attachment(@"D:\test2.docx"));  //附件
+            //msg.Priority = MailPriority.High;//郵件優先級
+            //設定smtp sever及port
+            SmtpClient myMail = new SmtpClient("smtp.gmail.com", 587);
+            myMail.Credentials = new System.Net.NetworkCredential("goodbye.n.hello.again@gmail.com", "Tobey1011"); //填入帳密
+            myMail.EnableSsl = true; //ssl打開，寄信時加密(gmail預設開啟驗證)
+            myMail.Send(message); //寄信
+            myMail.Dispose(); //傳送結束訊息給smtp
+            message.Dispose(); //釋放Mailmessage所使用的所有資源
+        }
+        #endregion
+
+
     }
-
-
-
-
-
 }
+
+
+
+
+

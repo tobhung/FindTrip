@@ -21,6 +21,7 @@ namespace FindTrip_Web.Models
         [MaxLength(200)]
         public string Comment2 { get; set; }
 
+
         public int CommentTotal { get; set; }
 
         public int LikeTotal { get; set; }
@@ -32,6 +33,6 @@ namespace FindTrip_Web.Models
         [ForeignKey("MemberId")]
         public virtual Member MyMember { get; set; }
 
-        public virtual ICollection<WishBoardReply> WishBoardReplies { get; set; }
+        //public virtual ICollection<WishBoardReply> WishBoardReplies { get; set; }
     }
 }

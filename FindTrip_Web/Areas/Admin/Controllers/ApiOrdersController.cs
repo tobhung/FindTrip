@@ -94,7 +94,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
                 PlannerName = db.TravelPlans.Where(y => y.id == x.TravelPlan_id).Select(y => new
                 {
-                    y.MyMember.name
+                    y.MyMember.PlannerName
                 })
 
                 //Plan = db.TravelPlans.Where(y=>y.id== x.TravelPlan_id).Select(y=> new
@@ -147,7 +147,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
                PlannerName = db.TravelPlans.Where(y=>y.id == x.TravelPlan_id).Select(y=>new
                {
-                   y.MyMember.name
+                   y.MyMember.PlannerName
                })
 
                //PlanPic = x.MyMember.TravelPlans.Where(z => z.id == x.TravelPlan_id).Select(z => new
@@ -226,7 +226,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             {
                 x.id,
                 x.MemberId,
-                x.MyMember.name,
+                x.MyMember.name, //get this as planner name?? 
                 x.MyMember.Tel,
                 x.MyMember.manpic,
                 x.DepartureTime1,

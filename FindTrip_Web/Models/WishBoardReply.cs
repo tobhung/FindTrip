@@ -16,11 +16,14 @@ namespace FindTrip_Web.Models
         public string NewComment { get; set; }
       
         public int Rid { get; set; }
-        [ForeignKey("Rid")]
-        public virtual WishBoardReply MyWishBoardReply { get; set; }
+        //[ForeignKey("Rid")]
+        //public virtual WishBoard MyWishBoard { get; set; }
 
         public DateTime? CreateOn { get; set; }
         public int MemberId { get; set; }
         public virtual Member MyMember { get; set; }
+
+        public int? Like { get; set; }
+
     }
 }

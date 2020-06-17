@@ -12,12 +12,13 @@ namespace FindTrip_Web.Models
         [Key]
         public int id { get; set; }
 
+        public int MessageId { get; set; }
         public int MemberId { get; set; }
-        //public virtual Member MyMember { get; set; }
+        public virtual Member MyMember { get; set; }
 
         public string MessageContent { get; set;  }
 
-        public DateTime CreateOn { get; set; }
+        public DateTime? CreateOn { get; set; }
 
     }
 }
