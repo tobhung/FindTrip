@@ -27,7 +27,7 @@ namespace FindTrip_Web.Models
         public DateTime? CreateOn { get; set; }
 
         public double StarAmount { get; set; }
-        public int Ratingtotal { get; set; }
+        public int? Ratingtotal { get; set; }
 
         public double? star{ get; set; }//average
 

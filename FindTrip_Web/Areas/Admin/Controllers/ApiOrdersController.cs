@@ -87,7 +87,8 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 x.Secret,
                 x.Shopping,
                 x.Religion,
-                PlanPic = x.MyMember.TravelPlans.Where(z=>z.id==x.TravelPlan_id).Select(z=>new
+                x.CreateOn,
+                PlanPic = db.TravelPlans.Where(z=>z.id==x.TravelPlan_id).Select(z=>new
                 {
                     z.Cpicture
                 }),
@@ -95,7 +96,12 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 PlannerName = db.TravelPlans.Where(y => y.id == x.TravelPlan_id).Select(y => new
                 {
                     y.MyMember.PlannerName
+                }),
+
+                PlannerEmail = db.TravelPlans.Where(e=>e.id == x.TravelPlan_id).Select(e=>new{
+                    e.MyMember.Email
                 })
+
 
                 //Plan = db.TravelPlans.Where(y=>y.id== x.TravelPlan_id).Select(y=> new
                 //    {
@@ -201,7 +207,11 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     {
                         y.Cpicture
 
-                    })
+                    }),
+
+                    x.MyMember.manpic
+
+                    
 
                 });
 
@@ -226,6 +236,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             {
                 x.id,
                 x.MemberId,
+                x.MyMember.Email,
                 x.MyMember.name, //get this as planner name?? 
                 x.MyMember.Tel,
                 x.MyMember.manpic,
@@ -239,6 +250,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 x.TravelPlan_id,
                 x.CreateOn,
                 x.Status,
+                
 
             }).ToList();
 
@@ -402,12 +414,15 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             order.MemberId = Mid;
             order.CreateOn = DateTime.Now;
             order.Status = 1;
+       
 
 
             var result1 = String.Join("", order.DepartureTime1); // why doesn't it split?, and this doesn't work
 
             var planner = db.TravelPlans.Find(order.TravelPlan_id);
             order.PlannerId = planner.MemberId;
+            order.country = planner.country;
+            order.city = planner.city;
 
             if (Mid == order.PlannerId)
             {
@@ -420,13 +435,19 @@ namespace FindTrip_Web.Areas.Admin.Controllers
 
             order.PointsLeft = currentPoints;
             member.points = currentPoints;
-            
-            
 
+            var newPoints = planner.MyMember.points + planner.points;
+            planner.MyMember.points = newPoints;
+
+            if (member.points < 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new {success = false, message = " 不夠錢啦"});
+            }
+           
 
             db.Orders.Add(order);
             db.Entry(member).State = EntityState.Modified;
-
+            db.Entry(planner).State = EntityState.Modified;
             db.SaveChanges();
 
             var result = db.Orders.Where(x => x.id == order.id).Select(x => new

@@ -157,7 +157,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             {
                 x.id,
                 x.TravelId,
-                x.rating,
+                x.Ratingtotal,
                 x.star,
                 x.RatingContent
             });

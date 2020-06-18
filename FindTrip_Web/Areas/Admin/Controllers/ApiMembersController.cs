@@ -91,7 +91,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             {
                 var result = db.Members.Where(x => x.id == Mid).Select(x => new
                 {
-                    x.id,
+                   PlannerId =  x.id,
                     x.name,
                     x.manpic,
                     x.points,
@@ -105,6 +105,7 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                     x.PlannerSocial3,
                     x.PlannerSocial4,
                     x.Email
+                    
                 });
 
                 return Request.CreateResponse(HttpStatusCode.OK, new { success = true, result });

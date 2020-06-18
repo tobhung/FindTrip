@@ -44,35 +44,40 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         [Route("search")]
         public HttpResponseMessage GetSearchPlans(string search)
         {
-            var result = db.TravelPlans.Where(x => x.country.Contains(search)|| x.city.Contains(search) || x.Act == true || x.Culture == true || x.Food == true || x.Religion == true ||x.Secret == true || x.Shopping == true).Select(x => new
-            {
-                x.id,
-                x.MemberId,
-                x.points,
-                x.Cpicture,
-                x.MyMember.manpic,
-                x.MyMember.name,
-                x.country,
-                x.city,
-                x.CreateOn,
 
-                tags = new
-                {
-                    x.Act,
-                    x.Culture,
-                    x.Food,
-                    x.Secret,
-                    x.Shopping,
-                    x.Religion
-                },
+            var result = db.TravelPlans.Where(x => x.country.Contains(search) || x.city.Contains(search)).Select(
+                    x => new
+                    {
+                        x.id,
+                        x.MemberId,
+                        x.points,
+                        x.TPBGImg,
+                        x.MyMember.manpic,
+                        x.MyMember.name,
+                        x.country,
+                        x.city,
+                        x.CreateOn,
 
-                rating = db.Ratings.Count(y => y.TravelId == x.id),
-                star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null ? 0 : db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
+                        tags = new
+                        {
+                            x.Act,
+                            x.Culture,
+                            x.Food,
+                            x.Secret,
+                            x.Shopping,
+                            x.Religion
+                        },
+
+                        rating = db.Ratings.Count(y => y.TravelId == x.id),
+                        star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null
+                            ? 0
+                            : db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
+
+                    });
+
+                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, message = "搜尋成功", result});
 
 
-            });
-
-            return Request.CreateResponse(HttpStatusCode.OK, new{success=true, message="搜尋成功", result});
         }
         public IQueryable<TravelPlan> GetTravelPlans()
         {
@@ -99,14 +104,14 @@ namespace FindTrip_Web.Areas.Admin.Controllers
             Countries country = new Countries();
 
             var countries = db.TravelPlans.Select(c => c.country);
-            var allPlans = db.TravelPlans.Select(x => new
+            var allPlans = db.TravelPlans.OrderByDescending(x=>x.CreateOn).Select(x => new
             {
                 x.id,
                 x.MemberId,
                 x.points,
                 x.TPBGImg,
                 x.MyMember.manpic,
-                x.MyMember.name,
+                name = x.MyMember.PlannerName,
                 x.country,
                 x.city,
                 x.CreateOn,
@@ -125,8 +130,6 @@ namespace FindTrip_Web.Areas.Admin.Controllers
                 star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average() == null
                     ? 0
                     : db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
-
-
 
             });
 
@@ -243,48 +246,99 @@ namespace FindTrip_Web.Areas.Admin.Controllers
         public HttpResponseMessage GetPlanInner(int id)
         {
             TravelPlan travelPlan = db.TravelPlans.Find(id);
-         
-      
-                var result = db.TravelPlans.Where(x => x.id == id).Select(x => new
+
+            var result = new
+            {
+                travelPlan.id,
+                travelPlan.TravelPlanIntro,
+                travelPlan.TPExperience,
+                travelPlan.TPBGImg,
+                travelPlan.Cpicture,
+                travelPlan.points,
+                travelPlan.country,
+                travelPlan.city,
+                travelPlan.Act,
+                travelPlan.Culture,
+                travelPlan.Food,
+                travelPlan.Shopping,
+                travelPlan.Secret,
+                travelPlan.Religion,
+                travelPlan.MyMember.PlannerIntro,
+                travelPlan.MyMember.PlannerName,
+                travelPlan.MyMember.PlannerSocial3,
+                travelPlan.MyMember.PlannerSocial4,
+                travelPlan.MyMember.manpic,
+                PlannerId = travelPlan.MyMember.id,
+
+                rating = db.Ratings.Where(y => y.TravelId == travelPlan.id).Select(y => new
                 {
-                    x.id,
-                    x.TravelPlanIntro,
-                    x.TPExperience,
-                    x.TPBGImg,
-                    x.Cpicture,
-                    x.points,
-                    x.country,
-                    x.city,
-                    x.Act,
-                    x.Culture,
-                    x.Food,
-                    x.Shopping,
-                    x.Secret,
-                    x.Religion,
-                    x.MyMember.MemberIntro,
-                    x.MyMember.name,
-                    x.MyMember.PlannerSocial1,
-                    x.MyMember.PlannerSocial2,
-                    x.MyMember.manpic,
+                    y.Ratingtotal,
+                    y.star,
+                    buyerName = db.Orders.Where(z => z.TravelPlan_id == travelPlan.id).Select(z => z.MyMember.name)
+                        .FirstOrDefault(),
+                    buyerPic = db.Orders.Where(a => a.TravelPlan_id == travelPlan.id).Select(a => a.MyMember.manpic)
+                        .FirstOrDefault(),
+                    y.RatingContent,
+                    y.CreateOn
 
-                    //rating = db.Ratings.Count(y => y.TravelId == x.id),
-                    //star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
-                    //username = db.Orders.Where(a=>a.TravelPlan_id == x.id).Select(a=>a.MyMember.name),
-                    //userpic = db.Orders.Where(b=>b.TravelPlan_id == x.id).Select(b=>b.MyMember.manpic),
 
-                    rating = db.Ratings.Where(y => y.TravelId == x.id).Select(y => new
-                    {
-                        y.rating,
-                        y.star,
-                        buyerName = db.Orders.Where(z => z.TravelPlan_id == x.id).Select(z => z.MyMember.name).FirstOrDefault(),
-                        buyerPic = db.Orders.Where(a => a.TravelPlan_id == x.id).Select(a => a.MyMember.manpic).FirstOrDefault(),
-                        y.RatingContent
+                }),
 
-                    })
+                ratings = db.Ratings.Count(y => y.TravelId == travelPlan.id),
+                stars = db.Ratings.Where(z => z.TravelId == travelPlan.id).Select(z => z.star).Sum() == null
+                    ? 0
+                    : db.Ratings.Where(z => z.TravelId == travelPlan.id).Select(z => z.star).Average(),
 
-                });
 
-                return Request.CreateResponse(HttpStatusCode.OK, new {success = true, result});
+            };
+
+                //var result = db.TravelPlans.Where(x => x.id == id).Select(x => new
+                //{
+                //    x.id,
+                //    x.TravelPlanIntro,
+                //    x.TPExperience,
+                //    x.TPBGImg,
+                //    x.Cpicture,
+                //    x.points,
+                //    x.country,
+                //    x.city,
+                //    x.Act,
+                //    x.Culture,
+                //    x.Food,
+                //    x.Shopping,
+                //    x.Secret,
+                //    x.Religion, 
+                //    x.MyMember.PlannerIntro,
+                //    x.MyMember.PlannerName,
+                //    x.MyMember.PlannerSocial3,
+                //    x.MyMember.PlannerSocial4,
+                //    x.MyMember.manpic,
+
+      //    //rating = db.Ratings.Count(y => y.TravelId == x.id),
+      //    //star = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
+      //    //username = db.Orders.Where(a=>a.TravelPlan_id == x.id).Select(a=>a.MyMember.name),
+      //    //userpic = db.Orders.Where(b=>b.TravelPlan_id == x.id).Select(b=>b.MyMember.manpic),
+
+      //    rating = db.Ratings.Where(y => y.TravelId == x.id).Select(y => new
+      //    {
+      //        y.Ratingtotal,
+      //        y.star,
+      //        buyerName = db.Orders.Where(z => z.TravelPlan_id == x.id).Select(z => z.MyMember.name).FirstOrDefault(),
+      //        buyerPic = db.Orders.Where(a => a.TravelPlan_id == x.id).Select(a => a.MyMember.manpic).FirstOrDefault(),
+      //        y.RatingContent,
+      //        y.CreateOn
+
+
+      //    }),
+
+      //    ratings = db.Ratings.Count(y => y.TravelId == x.id),
+      //    stars = db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Sum() == null
+      //        ? 0
+      //        : db.Ratings.Where(z => z.TravelId == x.id).Select(z => z.star).Average(),
+
+      //});
+
+            return Request.CreateResponse(HttpStatusCode.OK, new {success = true, result});
             }
 
 
